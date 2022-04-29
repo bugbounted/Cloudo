@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Cloudo</string>
-
+    <string name="otp"><![CDATA[<font color="#a3a3a3">We will send you an</font> <font color="#000000">One Time Password</font> <font color="#a3a3a3">on this mobile number</font>]]></string>
+    <string name="otp1"><![CDATA[<font color="#a3a3a3">Enter OTP send to your given phone number </font> ]]></string>
 </resources>

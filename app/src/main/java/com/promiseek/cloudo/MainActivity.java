@@ -1,11 +1,13 @@
 package com.promiseek.cloudo;
 
+import android.content.Context;
 import android.content.Intent;
 
 import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Environment;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.promiseek.cloudo.Otp_Confirmation;
 import com.promiseek.cloudo.R;
+import com.promiseek.cloudo.RegistationAndLogin.Login;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -53,11 +56,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         filePathDirectory = getFilesDir().getAbsolutePath();
         filePathName =getFilesDir().getAbsolutePath()+"/"+"tdlib.log";
         File file = new File(filePathName);
+
+
 
         // disable TDLib log
         Client.execute(new TdApi.SetLogVerbosityLevel(0));
@@ -66,45 +71,44 @@ public class MainActivity extends AppCompatActivity {
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
 
-
         // create client
-        client = Client.create(new UpdateHandler(), null, null);
+        client = Client.create(new UpdateHandler(MainActivity.this), null, null);
 
         // test Client.execute
         defaultHandler.onResult(Client.execute(new TdApi.GetTextEntities("@telegram /test_command https://telegram.org telegram.me @gif @test")));
 
         // main loop
-        while (!needQuit) {
-            // await authorization
-            authorizationLock.lock();
-            try {
-                while (!haveAuthorization) {
-                    gotAuthorization.await();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                authorizationLock.unlock();
-            }
-
-            while (haveAuthorization) {
-//                getCommand();
-                Log.i("need authorization", "yes");
-            }
-        }
-        while (!canQuit) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        while (!needQuit) {
+//            // await authorization
+//            authorizationLock.lock();
+//            try {
+//                while (!haveAuthorization) {
+//                    gotAuthorization.await();
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } finally {
+//                authorizationLock.unlock();
+//            }
+//
+//            while (haveAuthorization) {
+////                getCommand();
+//                Log.i("authorizationfinal done", "yes");
+//            }
+//        }
+//        while (!canQuit) {
+//            try {
+//                Thread.sleep(1);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
 
 
     }
 
-    public static void onAuthorizationStateUpdated(TdApi.AuthorizationState authorizationState) {
+    public static void onAuthorizationStateUpdated(Context context, TdApi.AuthorizationState authorizationState) {
         if (authorizationState != null) {
             MainActivity.authorizationState = authorizationState;
         }
@@ -121,27 +125,30 @@ public class MainActivity extends AppCompatActivity {
                 parameters.applicationVersion = "1.0";
                 parameters.enableStorageOptimizer = true;
 
-                client.send(new TdApi.SetTdlibParameters(parameters), new AuthorizationRequestHandler());
-                Log.i("parameterDone", "yes");
+                client.send(new TdApi.SetTdlibParameters(parameters), new AuthorizationRequestHandler(context));
+
                 break;
             case TdApi.AuthorizationStateWaitEncryptionKey.CONSTRUCTOR:
-                Log.i("need encryption key1", "yes");
-                client.send(new TdApi.CheckDatabaseEncryptionKey(), new AuthorizationRequestHandler());
-                Log.i("need encryption key2", "yes");
+                client.send(new TdApi.CheckDatabaseEncryptionKey(), new AuthorizationRequestHandler(context));
+
                 break;
             case TdApi.AuthorizationStateWaitPhoneNumber.CONSTRUCTOR: {
-                Log.i("put phone number", "yes");
+                Intent intent = new Intent(context, Login.class);
+
+                context.startActivity(intent);
+
+
 //                String phoneNumber = promptString("Please enter phone number: ");
 //                client.send(new TdApi.SetAuthenticationPhoneNumber(phoneNumber, null), new AuthorizationRequestHandler());
                 break;
             }
             case TdApi.AuthorizationStateWaitOtherDeviceConfirmation.CONSTRUCTOR: {
                 String link = ((TdApi.AuthorizationStateWaitOtherDeviceConfirmation) MainActivity.authorizationState).link;
-                System.out.println("Please confirm this login link on another device: " + link);
+                Toast.makeText(context, "Please confirm this login link on another device: " + link, Toast.LENGTH_SHORT).show();
                 break;
             }
             case TdApi.AuthorizationStateWaitCode.CONSTRUCTOR: {
-
+                context.startActivity(new Intent(context,Otp_Confirmation.class));
 //                String code = promptString("Please enter authentication code: ");
 //                client.send(new TdApi.CheckAuthenticationCode(code), new AuthorizationRequestHandler());
                 break;
@@ -177,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             case TdApi.AuthorizationStateClosed.CONSTRUCTOR:
 //                print("Closed");
                 if (!needQuit) {
-                    client = Client.create(new UpdateHandler(), null, null); // recreate client after previous has closed
+                    client = Client.create(new UpdateHandler(context), null, null); // recreate client after previous has closed
                 } else {
                     canQuit = true;
                 }
@@ -190,20 +197,25 @@ public class MainActivity extends AppCompatActivity {
     private static class DefaultHandler implements Client.ResultHandler {
         @Override
         public void onResult(TdApi.Object object) {
-//            print(object.toString());
+//            Log.i("objectResulttt", object.toString());
         }
     }
 
     public static class AuthorizationRequestHandler implements Client.ResultHandler {
+        Context context;
+        public AuthorizationRequestHandler(Context context) {
+            this.context= context;
+        }
+
         @Override
         public void onResult(TdApi.Object object) {
             switch (object.getConstructor()) {
                 case TdApi.Error.CONSTRUCTOR:
                     System.err.println("Receive an error:" + newLine + object);
-                    onAuthorizationStateUpdated(null); // repeat last action
+                    onAuthorizationStateUpdated(context,null); // repeat last action
                     break;
                 case TdApi.Ok.CONSTRUCTOR:
-                    // result is already received through UpdateAuthorizationState, nothing to do
+
                     break;
                 default:
                     System.err.println("Receive wrong response from TDLib:" + newLine + object);

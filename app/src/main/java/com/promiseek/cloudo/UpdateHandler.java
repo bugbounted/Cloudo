@@ -1,5 +1,7 @@
 package com.promiseek.cloudo;
 
+import android.content.Context;
+
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -20,6 +22,10 @@ public class UpdateHandler implements Client.ResultHandler {
     private static final ConcurrentMap<Long, TdApi.UserFullInfo> usersFullInfo = new ConcurrentHashMap<Long, TdApi.UserFullInfo>();
     private static final ConcurrentMap<Long, TdApi.BasicGroupFullInfo> basicGroupsFullInfo = new ConcurrentHashMap<Long, TdApi.BasicGroupFullInfo>();
     private static final ConcurrentMap<Long, TdApi.SupergroupFullInfo> supergroupsFullInfo = new ConcurrentHashMap<Long, TdApi.SupergroupFullInfo>();
+    Context context;
+    public UpdateHandler(Context context) {
+        this.context = context;
+    }
 
     public static void setChatPositions(TdApi.Chat chat, TdApi.ChatPosition[] positions) {
         synchronized (mainChatList) {
@@ -47,7 +53,7 @@ public class UpdateHandler implements Client.ResultHandler {
     public void onResult(TdApi.Object object) {
         switch (object.getConstructor()) {
             case TdApi.UpdateAuthorizationState.CONSTRUCTOR:
-                onAuthorizationStateUpdated(((TdApi.UpdateAuthorizationState) object).authorizationState);
+                onAuthorizationStateUpdated(context,((TdApi.UpdateAuthorizationState) object).authorizationState);
                 break;
 
             case TdApi.UpdateUser.CONSTRUCTOR:

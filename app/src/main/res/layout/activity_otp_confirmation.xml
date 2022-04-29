@@ -7,7 +7,21 @@
     android:background="#ffffff"
     tools:context=".Otp_Confirmation">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:theme="@style/AppTheme.Toolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -65,7 +79,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="16.66"
+                        android:layout_weight="19.86"
                         android:background="#f6f6f6">
 
                         <EditText
@@ -87,7 +101,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="16.66"
+                        android:layout_weight="19.86"
                         android:layout_marginLeft="8dp"
                         android:background="#f6f6f6">
 
@@ -111,7 +125,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="16.66"
+                        android:layout_weight="19.86"
                         android:layout_marginLeft="8dp"
                         android:background="#f6f6f6">
 
@@ -134,7 +148,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="16.66"
+                        android:layout_weight="19.86"
                         android:layout_marginLeft="8dp"
                         android:background="#f6f6f6">
 
@@ -157,7 +171,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="16.66"
+                        android:layout_weight="19.86"
                         android:layout_marginLeft="8dp"
                         android:background="#f6f6f6">
 
@@ -177,29 +191,7 @@
                             android:textSize="16sp" />
 
                     </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="16.66"
-                        android:layout_marginLeft="8dp"
-                        android:background="#f6f6f6">
 
-                        <EditText
-                            android:id="@+id/otp_box_6"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@null"
-                            android:fontFamily="@font/gotham"
-                            android:hint="&#x2731;"
-                            android:inputType="phone"
-                            android:maxLength="1"
-                            android:padding="12dp"
-                            android:textAlignment="center"
-                            android:textColor="#000000"
-                            android:textColorHint="#c7c7c8"
-                            android:textSize="16sp" />
-
-                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -214,6 +206,7 @@
                     android:textColor="#a3a3a3"
                     android:textSize="16sp" />
                 <TextView
+                    android:id="@+id/resendOtp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"

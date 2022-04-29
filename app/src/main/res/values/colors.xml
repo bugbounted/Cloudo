@@ -10,4 +10,7 @@
     <color name="colorPrimary">#29a1dd</color>
     <color name="colorPrimaryDark">#2c987d</color>
     <color name="colorAccent">#2c987d</color>
+    <color name="country">#212121</color>
+    <color name="letter">#808080</color>
+    <color name="country_code">#2F8CC9</color>
 </resources>
